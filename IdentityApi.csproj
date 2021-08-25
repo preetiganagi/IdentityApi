@@ -13,6 +13,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.5" />
+    <PackageReference Include="System.Runtime" Version="4.3.1" />
   </ItemGroup>
     
   <ItemGroup>
@@ -20,7 +21,6 @@
     <None Remove="Views\Role\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Views\User\" />
     <Folder Include="Views\Role\" />
   </ItemGroup>
 </Project>

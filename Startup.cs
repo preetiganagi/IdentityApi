@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace IdentityApi
 {
+
     public class Startup
     {
         public Startup(IConfiguration configuration)

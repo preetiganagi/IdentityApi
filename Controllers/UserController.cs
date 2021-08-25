@@ -37,7 +37,7 @@ namespace IdentityApi.Controllers
         public IActionResult Edit(string Id)
         {
             var user = _userManager.Users.Where(s => s.Id == Id).FirstOrDefault();
-
+            ViewBag.Roles =  _userManager.Roles.ToList();
             return View(user);
 
         }
@@ -62,6 +62,21 @@ namespace IdentityApi.Controllers
             TempData["EditMessage"] = "User Edited Successfully";
             //return View("./../../Areas/Identity/Pages/Account/ListUsers");
              return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public IActionResult AddRole(string Id)
+        {
+            if (Id != null)
+            {
+                var UserRoleObj = _userManager.UserRoles.Where(s => s.UserId == Id).FirstOrDefault();
+                var RoleObj = _userManager.Roles.Where(s => s.Id == UserRoleObj.RoleId).FirstOrDefault();
+                return View(RoleObj);
+            }
+
+            return View();
+         
+
         }
     }
 }
