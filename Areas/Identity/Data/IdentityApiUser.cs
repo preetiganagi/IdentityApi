@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,7 +16,15 @@ namespace IdentityApi.Areas.Identity.Data
         public string FirstName { get; set; }
 
         [PersonalData]
+        //[DataType(DataType.Date)]
+        [Required]
+        [StringLength(100)]
         [Column(TypeName = "nvarchar(100)")]
         public string LirstName { get; set; }
+
+        public static implicit operator UserManager<object>(IdentityApiUser v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
