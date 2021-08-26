@@ -29,15 +29,45 @@ namespace IdentityApi.Controllers
         // GET: /<controller>/
         public IActionResult Index()
         {
-
             return View();
         }
 
         [HttpGet]
         public IActionResult Edit(string Id)
         {
+           
+
             var user = _userManager.Users.Where(s => s.Id == Id).FirstOrDefault();
             ViewBag.Roles =  _userManager.Roles.ToList();
+
+           var AdminRole =  _userManager.Roles
+                    .Join(
+            _userManager.UserRoles,
+                role => role.Id,
+                userrole => userrole.RoleId,
+
+                (role, userrole) => new
+                {
+                    RoleId = role.Id,
+                    UserId = userrole.UserId,
+                    RoleName = role.NormalizedName
+                }
+            ).Where(c => c.RoleName == "admin").FirstOrDefault();
+
+            ViewBag.AdminRoleUser = AdminRole;
+
+          var  LoginUserRole = _userManager.Roles.Join(_userManager.UserRoles,
+                role => role.Id,
+                userrole => userrole.RoleId,
+
+                (role, userrole) => new
+                {
+                    RoleId = role.Id,
+                    UserId = userrole.RoleId,
+                    RoleName = role.Name
+                }
+            ).Where(c => c.UserId == Id ).FirstOrDefault();
+            ViewBag.LoginUserRole = LoginUserRole;
             return View(user);
 
         }
