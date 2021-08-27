@@ -38,38 +38,39 @@ namespace IdentityApi.Controllers
         [HttpGet]
         public IActionResult Edit(string Id)
         {
-           
+
 
             var user = _userManager.Users.Where(s => s.Id == Id).FirstOrDefault();
-            ViewBag.Roles =  _userManager.Roles.ToList();
+            ViewBag.Roles = _userManager.Roles.ToList();
 
-           var AdminRole =  _userManager.Roles
-                    .Join(
-            _userManager.UserRoles,
-                role => role.Id,
-                userrole => userrole.RoleId,
+            //var AdminRole = _userManager.Roles
+            //         .Join(
+            // _userManager.UserRoles,
+            //     role => role.Id,
+            //     userrole => userrole.RoleId,
 
-                (role, userrole) => new AdminRoleAttributes
-                {
-                    RoleId = role.Id,
-                    UserId = userrole.UserId,
-                    RoleName = role.NormalizedName
-                }
-            ).Where(c => c.RoleName == "admin").FirstOrDefault();
+            //     (role, userrole) => new AdminRoleAttributes
+            //     {
+            //         RoleId = role.Id,
+            //         UserId = userrole.UserId,
+            //         RoleName = role.NormalizedName
+            //     }
+            // ).Where(c => c.RoleName == "admin").FirstOrDefault();
 
-            ViewBag.AdminRoleUser = AdminRole;
+            var AdminRole = _userManager.Roles.Where(s => s.NormalizedName == "admin").FirstOrDefault();
+            ViewBag.AdminRoleUser = AdminRole.Id;
+            TempData["adminrole"] = AdminRole.Id;
+            var LoginUserRole = _userManager.Roles.Join(_userManager.UserRoles,
+                  role => role.Id,
+                  userrole => userrole.RoleId,
 
-          var  LoginUserRole = _userManager.Roles.Join(_userManager.UserRoles,
-                role => role.Id,
-                userrole => userrole.RoleId,
-
-                (role, userrole) => new AdminRoleAttributes
-                {
-                    RoleId = role.Id,
-                    UserId = userrole.UserId,
-                    RoleName = role.Name
-                }
-            ).Where(c => c.UserId == Id ).FirstOrDefault();
+                  (role, userrole) => new AdminRoleAttributes
+                  {
+                      RoleId = role.Id,
+                      UserId = userrole.UserId,
+                      RoleName = role.Name
+                  }
+              ).Where(c => c.UserId == Id).FirstOrDefault();
             ViewBag.LoginUserRole = LoginUserRole;
             return View(user);
 
@@ -92,13 +93,31 @@ namespace IdentityApi.Controllers
                 _userManager.Users.Update(Edituser);
 
                 _userManager.SaveChanges();
+                var roleid = Euser.RoleId;
+                var userid = Edituser.Id;
 
-                await userManager.AddToRoleAsync(Edituser, Euser.RoleId);
+                if (roleid != null)
+                {
+                    var addrole = _userManager.UserRoles.Where(s => s.UserId == Edituser.Id).FirstOrDefault();
+                    _userManager.UserRoles.Remove(addrole);
+                    _userManager.SaveChanges();
+
+                    addrole.RoleId = roleid;
+                    addrole.UserId = userid;
+                    _userManager.UserRoles.Add(addrole);
+
+                    _userManager.SaveChanges();
+
+                }
+
+
+
+                // await userManager.AddToRoleAsync(Edituser, Euser.RoleId);
 
             }
             TempData["EditMessage"] = "User Edited Successfully";
             //return View("./../../Areas/Identity/Pages/Account/ListUsers");
-             return RedirectToAction("Index");
+            return RedirectToAction("Index");
         }
 
         [HttpGet]
@@ -112,8 +131,27 @@ namespace IdentityApi.Controllers
             }
 
             return View();
-         
 
+
+        }
+
+        [HttpGet]
+        public IActionResult Delete(string Id)
+        {
+
+            var delrole = _userManager.UserRoles.Where(s => s.UserId == Id).FirstOrDefault();
+            if (delrole != null)
+            {
+                _userManager.UserRoles.Remove(delrole);
+                _userManager.SaveChanges();
+            }
+           
+
+            var DelUser = _userManager.Users.Where(s => s.Id == Id).FirstOrDefault();
+            _userManager.Users.Remove(DelUser);
+            _userManager.SaveChanges();
+            TempData["EditMessage"] = "User deleted Successfully";
+            return View("Index");
         }
     }
 
