@@ -59,7 +59,7 @@ namespace IdentityApi.Controllers
 
             var AdminRole = _userManager.Roles.Where(s => s.NormalizedName == "admin").FirstOrDefault();
             ViewBag.AdminRoleUser = AdminRole.Id;
-
+            TempData["adminrole"] = AdminRole.Id;
             var LoginUserRole = _userManager.Roles.Join(_userManager.UserRoles,
                   role => role.Id,
                   userrole => userrole.RoleId,
