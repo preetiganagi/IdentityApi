@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using IdentityApi.Areas.Identity.Data;
 using IdentityApi.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace IdentityApi.Controllers
@@ -15,12 +17,13 @@ namespace IdentityApi.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IdentityApiContext _userManager;
+        private readonly UserManager<IdentityApiUser> userManager;
 
-
-        public UserController(ILogger<UserController> logger, IdentityApiContext userManager)
+        public UserController(ILogger<UserController> logger, IdentityApiContext userManagerContext, UserManager<IdentityApiUser> userManagerRole)
         {
             _logger = logger;
-            _userManager = userManager;
+            _userManager = userManagerContext;
+            userManager = userManagerRole;
         }
 
         [BindProperty]
@@ -46,7 +49,7 @@ namespace IdentityApi.Controllers
                 role => role.Id,
                 userrole => userrole.RoleId,
 
-                (role, userrole) => new
+                (role, userrole) => new AdminRoleAttributes
                 {
                     RoleId = role.Id,
                     UserId = userrole.UserId,
@@ -60,10 +63,10 @@ namespace IdentityApi.Controllers
                 role => role.Id,
                 userrole => userrole.RoleId,
 
-                (role, userrole) => new
+                (role, userrole) => new AdminRoleAttributes
                 {
                     RoleId = role.Id,
-                    UserId = userrole.RoleId,
+                    UserId = userrole.UserId,
                     RoleName = role.Name
                 }
             ).Where(c => c.UserId == Id ).FirstOrDefault();
@@ -73,7 +76,7 @@ namespace IdentityApi.Controllers
         }
 
         [HttpPost]
-        public ActionResult Edit(IdentityApiUser Euser)
+        public async Task<ActionResult> Edit(IdentityApiUserRole Euser)
         {
             //update student in DB using EntityFramework in real-life application
 
@@ -81,13 +84,17 @@ namespace IdentityApi.Controllers
 
             if (ModelState.IsValid)
             {
-                var Edituser = _userManager.Users.Where(s => s.Id == Euser.Id).FirstOrDefault();
+                IdentityApiUser Edituser = _userManager.Users.Where(s => s.Id == Euser.Id).FirstOrDefault();
 
                 Edituser.LirstName = Euser.LirstName;
                 Edituser.FirstName = Euser.FirstName;
                 Edituser.PhoneNumber = Euser.PhoneNumber;
                 _userManager.Users.Update(Edituser);
+
                 _userManager.SaveChanges();
+
+                await userManager.AddToRoleAsync(Edituser, Euser.RoleId);
+
             }
             TempData["EditMessage"] = "User Edited Successfully";
             //return View("./../../Areas/Identity/Pages/Account/ListUsers");
@@ -108,5 +115,13 @@ namespace IdentityApi.Controllers
          
 
         }
+    }
+
+    public class AdminRoleAttributes
+    {
+        public string RoleId;
+        public string UserId;
+        public string RoleName;
+        
     }
 }

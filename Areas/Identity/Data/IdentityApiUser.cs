@@ -27,4 +27,9 @@ namespace IdentityApi.Areas.Identity.Data
             throw new NotImplementedException();
         }
     }
+
+    public class IdentityApiUserRole : IdentityApiUser
+    {
+        public string RoleId { get; set; }
+    }
 }

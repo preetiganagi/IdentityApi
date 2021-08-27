@@ -1,6 +1,12 @@
 ﻿
 @model IdentityApi.Areas.Identity.Data.IdentityApiUser
 
+@using Microsoft.AspNetCore.Identity
+@using IdentityApi.Areas.Identity.Data
+
+@inject SignInManager<IdentityApiUser> SignInManager
+@inject UserManager<IdentityApiUser> UserManager
+
 @{
 }
 <h1>Edit</h1>
@@ -27,33 +33,29 @@
                 <input asp-for="PhoneNumber" class="form-control" />
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
-            
+
             <div class="form-group">
                 <label class="control-label">AddRole</label>
-                <p> @ViewBag.AdminRoleUser  @Model.Id</p>
 
-                <p> @ViewBag.Roles;</p>
-
-
-                @*@if (RoleTest.UserId == @Model.Id)
+                @if (ViewBag.AdminRoleUser.UserId == UserManager.GetUserId(User))
                 {
-                        <select>
-                            Roles
-                            @foreach (var item in ViewBag.Roles)
-                            {
+                    <select name="RoleName" id="RoleId">
+                        roles
+                        @foreach (var item in ViewBag.Roles)
+                        {
 
-                                <option value=@item.Id> @item.Name  </option>
+                            <option value=@item.Name name="role" class="form-control"> @item.Name  </option>
 
-                            }
-                        </select>
-                 }
+                        }
+                    </select>
+                }
                 else
                 {
-                    <label class="control-label"> Role</label>
-                    <input class="form-control" value="@ViewBag.LoginUserRole.RoleName" disabled/>
-                }*@
+                    <label class="control-label"> role</label>
+                    <input class="form-control" value="@ViewBag.LoginUserRole.RoleName" disabled />
+                }
 
-                    </div>
+            </div>
 
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
