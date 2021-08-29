@@ -35,24 +35,27 @@
             </div>
 
             <div class="form-group">
-                <label class="control-label">AddRole</label>
-
-                @if (ViewBag.AdminRoleUser.UserId == UserManager.GetUserId(User))
+                @if (@ViewBag.LoginUserRole != null)
                 {
-                    <select name="RoleName" id="RoleId">
-                        roles
-                        @foreach (var item in ViewBag.Roles)
-                        {
+                    <label class="control-label">AddRole</label>
+                    @if (ViewBag.AdminRoleUser == @ViewBag.LoginUserRole.RoleId)
+                    {
+                        <select name="RoleId" id="RoleId">
+                            roles
+                            @foreach (var item in ViewBag.Roles)
+                            {
 
-                            <option value=@item.Name name="role" class="form-control"> @item.Name  </option>
+                                <option value=@item.Id name="role" class="form-control"> @item.Name  </option>
 
-                        }
-                    </select>
-                }
-                else
-                {
-                    <label class="control-label"> role</label>
-                    <input class="form-control" value="@ViewBag.LoginUserRole.RoleName" disabled />
+                            }
+                        </select>
+                    }
+                    else
+                    {
+                        <label class="control-label"> role</label>
+                        <input class="form-control" value="@ViewBag.LoginUserRole.RoleName" disabled />
+                        <input class="form-control" value="@ViewBag.LoginUserRole.RoleId" name="RoleId" id="RoleId" disabled hidden />
+                    }
                 }
 
             </div>

@@ -29,7 +29,8 @@ namespace IdentityApi.Areas.Identity.Pages.Account
             UserManager<IdentityApiUser> userManager,
             SignInManager<IdentityApiUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender
+            )
         {
             _userManager = userManager;
             _signInManager = signInManager;
