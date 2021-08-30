@@ -2,18 +2,20 @@
 @model IdentityApi.Areas.Identity.Pages.Account.ListUsersModel
 @{
     ViewData["Title"] = "Details";
+
 }
 
-
 <h1>Index</h1>
-
 <p>
-
+    <h2>@TempData["EditMessage"]</h2>
     @*<input name="search" /><button class="primary">search</button>*@
 </p>
 <table class="table">
     <thead>
         <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.User[0].Id)
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.User[0].FirstName)
             </th>
@@ -29,7 +31,11 @@
     <tbody>
         @foreach (var item in Model.User)
         {
+
             <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.FirstName)
                 </td>
@@ -40,9 +46,9 @@
                     @Html.DisplayFor(modelItem => item.PhoneNumber)
                 </td>
                 <td>
-                    <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                    <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                    <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="CreateAdmin" asp-route-id="@item.Id">Make Admin</a>
                 </td>
             </tr>
         }
