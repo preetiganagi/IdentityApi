@@ -1,5 +1,7 @@
-﻿using IdentityApi.Models;
+﻿using IdentityApi.Areas.Identity.Data;
+using IdentityApi.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,10 +15,12 @@ namespace IdentityApi.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<HomeController> _logger; 
+        private readonly SignInManager<IdentityApiUser> _signInManager;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(SignInManager<IdentityApiUser> signInManager, ILogger<HomeController> logger)
         {
+            _signInManager = signInManager;
             _logger = logger;
         }
 
@@ -28,6 +32,13 @@ namespace IdentityApi.Controllers
         public IActionResult Privacy()
         {
             return View();
+        }
+
+        public async Task<IActionResult> LogOut()
+        {
+            await _signInManager.SignOutAsync();
+            _logger.LogInformation("User logged out.");
+            return RedirectToAction("Index");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

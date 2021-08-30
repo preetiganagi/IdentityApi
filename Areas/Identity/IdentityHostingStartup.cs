@@ -21,6 +21,7 @@ namespace IdentityApi.Areas.Identity
                         context.Configuration.GetConnectionString("IdentityApiContextConnection")));
 
                 services.AddDefaultIdentity<IdentityApiUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                    .AddRoles<IdentityRole>()
                     .AddEntityFrameworkStores<IdentityApiContext>();
             });
         }

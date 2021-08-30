@@ -16,14 +16,14 @@ namespace IdentityApi.Controllers
     public class UserController : Controller
     {
         private readonly ILogger<UserController> _logger;
-        private readonly IdentityApiContext _userManager;
-        private readonly UserManager<IdentityApiUser> userManager;
+        private readonly IdentityApiContext _userContext;
+        private readonly UserManager<IdentityApiUser> _userManager;
 
-        public UserController(ILogger<UserController> logger, IdentityApiContext userManagerContext, UserManager<IdentityApiUser> userManagerRole)
+        public UserController(ILogger<UserController> logger, IdentityApiContext userManagerContext, UserManager<IdentityApiUser> userManager)
         {
             _logger = logger;
-            _userManager = userManagerContext;
-            userManager = userManagerRole;
+            _userContext = userManagerContext;
+            _userManager = userManager;
         }
 
         [BindProperty]
@@ -38,29 +38,13 @@ namespace IdentityApi.Controllers
         [HttpGet]
         public IActionResult Edit(string Id)
         {
+            var user = _userContext.Users.Where(s => s.Id == Id).FirstOrDefault();
+            ViewBag.Roles = _userContext.Roles.ToList();
 
-
-            var user = _userManager.Users.Where(s => s.Id == Id).FirstOrDefault();
-            ViewBag.Roles = _userManager.Roles.ToList();
-
-            //var AdminRole = _userManager.Roles
-            //         .Join(
-            // _userManager.UserRoles,
-            //     role => role.Id,
-            //     userrole => userrole.RoleId,
-
-            //     (role, userrole) => new AdminRoleAttributes
-            //     {
-            //         RoleId = role.Id,
-            //         UserId = userrole.UserId,
-            //         RoleName = role.NormalizedName
-            //     }
-            // ).Where(c => c.RoleName == "admin").FirstOrDefault();
-
-            var AdminRole = _userManager.Roles.Where(s => s.NormalizedName == "admin").FirstOrDefault();
+            var AdminRole = _userContext.Roles.Where(s => s.NormalizedName == "admin").FirstOrDefault();
             ViewBag.AdminRoleUser = AdminRole.Id;
             TempData["adminrole"] = AdminRole.Id;
-            var LoginUserRole = _userManager.Roles.Join(_userManager.UserRoles,
+            var LoginUserRole = _userContext.Roles.Join(_userContext.UserRoles,
                   role => role.Id,
                   userrole => userrole.RoleId,
 
@@ -85,28 +69,28 @@ namespace IdentityApi.Controllers
 
             if (ModelState.IsValid)
             {
-                IdentityApiUser Edituser = _userManager.Users.Where(s => s.Id == Euser.Id).FirstOrDefault();
+                IdentityApiUser Edituser = _userContext.Users.Where(s => s.Id == Euser.Id).FirstOrDefault();
 
                 Edituser.LirstName = Euser.LirstName;
                 Edituser.FirstName = Euser.FirstName;
                 Edituser.PhoneNumber = Euser.PhoneNumber;
-                _userManager.Users.Update(Edituser);
+                _userContext.Users.Update(Edituser);
 
-                _userManager.SaveChanges();
+                _userContext.SaveChanges();
                 var roleid = Euser.RoleId;
                 var userid = Edituser.Id;
 
                 if (roleid != null)
                 {
-                    var addrole = _userManager.UserRoles.Where(s => s.UserId == Edituser.Id).FirstOrDefault();
-                    _userManager.UserRoles.Remove(addrole);
-                    _userManager.SaveChanges();
+                    var addrole = _userContext.UserRoles.Where(s => s.UserId == Edituser.Id).FirstOrDefault();
+                    _userContext.UserRoles.Remove(addrole);
+                    _userContext.SaveChanges();
 
                     addrole.RoleId = roleid;
                     addrole.UserId = userid;
-                    _userManager.UserRoles.Add(addrole);
+                    _userContext.UserRoles.Add(addrole);
 
-                    _userManager.SaveChanges();
+                    _userContext.SaveChanges();
 
                 }
 
@@ -125,8 +109,8 @@ namespace IdentityApi.Controllers
         {
             if (Id != null)
             {
-                var UserRoleObj = _userManager.UserRoles.Where(s => s.UserId == Id).FirstOrDefault();
-                var RoleObj = _userManager.Roles.Where(s => s.Id == UserRoleObj.RoleId).FirstOrDefault();
+                var UserRoleObj = _userContext.UserRoles.Where(s => s.UserId == Id).FirstOrDefault();
+                var RoleObj = _userContext.Roles.Where(s => s.Id == UserRoleObj.RoleId).FirstOrDefault();
                 return View(RoleObj);
             }
 
@@ -139,18 +123,31 @@ namespace IdentityApi.Controllers
         public IActionResult Delete(string Id)
         {
 
-            var delrole = _userManager.UserRoles.Where(s => s.UserId == Id).FirstOrDefault();
+            var delrole = _userContext.UserRoles.Where(s => s.UserId == Id).FirstOrDefault();
             if (delrole != null)
             {
-                _userManager.UserRoles.Remove(delrole);
-                _userManager.SaveChanges();
+                _userContext.UserRoles.Remove(delrole);
+                _userContext.SaveChanges();
             }
            
 
-            var DelUser = _userManager.Users.Where(s => s.Id == Id).FirstOrDefault();
-            _userManager.Users.Remove(DelUser);
-            _userManager.SaveChanges();
+            var DelUser = _userContext.Users.Where(s => s.Id == Id).FirstOrDefault();
+            _userContext.Users.Remove(DelUser);
+            _userContext.SaveChanges();
             TempData["EditMessage"] = "User deleted Successfully";
+            return View("Index");
+        }
+
+        [HttpGet]
+        public IActionResult CreateAdmin(string Id)
+        {
+            IdentityApiUser user = new IdentityApiUser();
+            user = _userContext.Users.Where(s => s.Id == Id).FirstOrDefault();
+            var adminRole = _userContext.Roles.Where(s => s.Name == "Admin").FirstOrDefault();
+            var userRole = _userContext.UserRoles.Single(r => r.UserId == user.Id);
+            userRole.RoleId = adminRole.Id;
+            _userContext.UserRoles.Update(userRole); 
+            TempData["EditMessage"] = "Admin updated Successfully";
             return View("Index");
         }
     }

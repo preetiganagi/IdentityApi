@@ -2,10 +2,12 @@
 using System.Linq;
 using IdentityApi.Data;
 using IdentityApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityApi.Controllers
 {
+    [Authorize]
     public class RoleController : Controller
     {
         private readonly IdentityApiContext _db;
