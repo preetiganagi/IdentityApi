@@ -5,6 +5,12 @@
 
 }
 
+@using Microsoft.AspNetCore.Identity
+@using IdentityApi.Areas.Identity.Data
+
+@inject SignInManager<IdentityApiUser> SignInManager
+@inject UserManager<IdentityApiUser> UserManager
+
 <h1>Index</h1>
 <p>
     <h2>@TempData["EditMessage"]</h2>
@@ -46,9 +52,12 @@
                     @Html.DisplayFor(modelItem => item.PhoneNumber)
                 </td>
                 <td>
-                    <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                    <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                    <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="CreateAdmin" asp-route-id="@item.Id">Make Admin</a>
+                    @if (SignInManager.IsSignedIn(User) == true && User.IsInRole("Admin"))
+                    {
+                        <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                        <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="CreateAdmin" asp-route-id="@item.Id">Make Admin</a>
+                    }
                 </td>
             </tr>
         }
