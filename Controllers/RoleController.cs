@@ -47,14 +47,6 @@ namespace IdentityApi.Controllers
             return RedirectToAction("Index");
         }
 
-        [HttpGet]
-        public IActionResult Edit(string Id)
-        {
-            var role = _db.Roles.Find(Id);
-            ViewBag.Role = role;
-            return View(role);
-        }
-
         [HttpPost]
         public ActionResult Edit(Role role)
         {
