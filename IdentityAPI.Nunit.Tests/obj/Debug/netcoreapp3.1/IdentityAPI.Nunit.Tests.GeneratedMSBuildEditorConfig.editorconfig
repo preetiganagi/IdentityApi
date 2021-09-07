@@ -1,0 +1,3 @@
+is_global = true
+build_property.RootNamespace = IdentityAPI.Nunit.Tests
+build_property.ProjectDir = C:\Projects\IdentityApi\IdentityAPI.Nunit.Tests\
