@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using IdentityApi.Areas.Identity.Data;
+using System.Threading.Tasks;
 
 namespace IdentityAPI.Nunit.Tests
 {
@@ -60,6 +61,7 @@ namespace IdentityAPI.Nunit.Tests
             List<IdentityRole> roles = new List<IdentityRole>
             {
                 new IdentityRole { Name = "Admin", NormalizedName = "Admin"},
+                new IdentityRole { Name = "admin", NormalizedName = "admin"},
                 new IdentityRole { Name = "User", NormalizedName = "User"}
             };
 
@@ -85,9 +87,29 @@ namespace IdentityAPI.Nunit.Tests
         }
 
         [Test]
-        public void MakeAdminTest()
+        public void EditRoleTest()
         {
-            var result = _userController.CreateAdmin(_userController.getId()) as IActionResult;
+            var result = _userController.Edit(_userController.getId()) as IActionResult;
+            Assert.NotNull(result);
+        }
+
+        [Test]
+        public void EditUserRoleTest()
+        {
+            IdentityApiUserRole user = new IdentityApiUserRole()
+            {
+                Id = _userController.getId(),
+                FirstName = "test",
+                LirstName = "test"
+            };
+            var result = _userController.Edit(user) as Task<ActionResult>;
+            Assert.NotNull(result);
+        }
+
+        [Test]
+        public void AddRoleTest()
+        {
+            var result = _userController.AddRole(_userController.getId()) as IActionResult;
             Assert.NotNull(result);
         }
 
@@ -95,6 +117,13 @@ namespace IdentityAPI.Nunit.Tests
         public void DeleteTest()
         {
             var result = _userController.Delete(_userController.getId()) as IActionResult;
+            Assert.NotNull(result);
+        }
+
+        [Test]
+        public void CreateAdminTest()
+        {
+            var result = _userController.CreateAdmin(_userController.getId()) as IActionResult;
             Assert.NotNull(result);
         }
     }

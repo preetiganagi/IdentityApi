@@ -41,7 +41,7 @@ namespace IdentityAPI.Nunit.Tests
                                );
 
             _mockSignInManager = new Mock<SignInManager<IdentityApiUser>>(
-                                 _mockUserManager.Object,
+                                 _mockUserManager,
                                  new Mock<IHttpContextAccessor>().Object,
                                  new Mock<IUserClaimsPrincipalFactory<IdentityApiUser>>().Object,
                                  new Mock<IOptions<IdentityOptions>>().Object,
@@ -50,6 +50,15 @@ namespace IdentityAPI.Nunit.Tests
                                  new Mock<IUserConfirmation<IdentityApiUser>>().Object
                                  );
 
+            SignInManager<IdentityApiUser> signInManager = new SignInManager<IdentityApiUser>(
+                                 _mockUserManager.Object,
+                                 new Mock<IHttpContextAccessor>().Object,
+                                 new Mock<IUserClaimsPrincipalFactory<IdentityApiUser>>().Object,
+                                 new Mock<IOptions<IdentityOptions>>().Object,
+                                 new Mock<ILogger<SignInManager<IdentityApiUser>>>().Object,
+                                 new Mock<IAuthenticationSchemeProvider>().Object,
+                                 new Mock<IUserConfirmation<IdentityApiUser>>().Object);
+
 
             var serviceProvider = new ServiceCollection()
             .AddLogging()
@@ -57,7 +66,7 @@ namespace IdentityAPI.Nunit.Tests
             var loggerServiceProvider = serviceProvider.GetService<ILoggerFactory>();
 
             var logger = loggerServiceProvider.CreateLogger<HomeController>();
-            _homeController = new HomeController(_mockSignInManager.Object, logger);
+            _homeController = new HomeController(signInManager, logger);
         }
 
         [Test]

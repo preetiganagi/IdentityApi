@@ -20,6 +20,7 @@ namespace IdentityAPI.Nunit.Tests
         .Options;
         private RoleController _roleController;
         private IdentityRole newRole;
+        private IdentityApiContext context;
         public RoleControllerTest()
         {
             newRole = new IdentityRole()
@@ -28,9 +29,10 @@ namespace IdentityAPI.Nunit.Tests
                NormalizedName ="Admin"
             };
 
-            var context = new IdentityApiContext(dbContextOptions);
+            context = new IdentityApiContext(dbContextOptions);
             List<IdentityRole> Roles = new List<IdentityRole>
             {
+                new IdentityRole { Name = "SuperUser", NormalizedName = "SuperUser"},
                 new IdentityRole { Name = "Admin", NormalizedName = "Admin"},
                 new IdentityRole { Name = "User", NormalizedName = "User"}
             };
@@ -62,14 +64,15 @@ namespace IdentityAPI.Nunit.Tests
         [Test]
         public void EditTest()
         {
+            var id = _roleController.GetId();
             IdentityRole newRole = new IdentityRole()
             {
-                Id = _roleController.GetId(),
+                Id = id,
                 Name = "Developer",
                 NormalizedName = "Developer"
             };
             var result = _roleController.Edit(newRole) as IActionResult;
-            Assert.NotNull(result);
+            Assert.NotNull(context.Roles.Find(id));
         }
 
         [Test]
